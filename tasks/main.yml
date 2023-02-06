@@ -1,0 +1,36 @@
+---
+- name: Add EPEL repository
+  become: true
+  yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+- name: Install nginx
+  become: true
+  ansible.builtin.yum:
+    name: "nginx"
+    state: present
+    disable_gpg_check: true
+- name: Create lighthouse data dir
+  become: true
+  ansible.builtin.file:
+    path: "{{ lighthouse_path }}"
+    owner: nginx
+    mode: '700'
+    state: directory
+- name: Get lighthouse sources
+  become: true
+  ansible.builtin.git:
+    repo: 'https://github.com/VKCOM/lighthouse.git'
+    dest: "{{ lighthouse_path }}"
+    clone: true
+    update: false
+- name: Generate nginx config for lighthouse
+  become: true
+  ansible.builtin.template:
+    src: "./templates/lighthouse/nginx.j2"
+    dest: "/etc/nginx/nginx.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx service
