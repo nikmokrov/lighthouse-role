@@ -28,7 +28,7 @@
 - name: Generate nginx config for lighthouse
   become: true
   ansible.builtin.template:
-    src: "./templates/lighthouse/nginx.j2"
+    src: "./templates/nginx.j2"
     dest: "/etc/nginx/nginx.conf"
     owner: root
     group: root
